@@ -6,7 +6,13 @@ import '../../../util/appWindow.dart';
 class MenuMain {
   late List<MenuItem> menuList;
 
-  MenuMain() {
+  // final MenuItemLabel menuShowLicenses;
+  final MenuItemLabel menuQuit;
+
+  MenuMain({
+    // required this.menuShowLicenses,
+    required this.menuQuit,
+  }) {
     initMenuMain();
   }
 
@@ -23,11 +29,13 @@ class MenuMain {
       MenuItemLabel(
         label: 'Bugs And Request(WIP)',
       ),
+      // menuShowLicenses,
       MenuSeparator(),
-      MenuItemLabel(
-        label: 'Quit',
-        onClicked: (_) => appWindow.close(),
-      ),
+      menuQuit,
+      // MenuItemLabel(
+      //   label: 'Quit',
+      //   onClicked: (_) => appWindow.close(),
+      // )
     ];
   }
 }

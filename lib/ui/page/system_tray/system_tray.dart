@@ -1,5 +1,5 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:system_tray/system_tray.dart';
@@ -37,6 +37,8 @@ class StatefulSystemtray extends StatefulWidget {
 }
 
 class _StatefulSystemtrayState extends State<StatefulSystemtray> {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   final SystemTray _systemTray = SystemTray();
   final Menu _menuMain = Menu();
 
@@ -61,7 +63,7 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
   }
 
   Future<void> initSystemTray() async {
-    final mainMenuList = MenuMain().menuList;
+    final mainMenuList = initMenuMainItem();
 
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
@@ -79,6 +81,13 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
 
     await _menuMain.buildFrom(mainMenuList);
     _systemTray.setContextMenu(_menuMain);
+  }
+
+  List<MenuItem> initMenuMainItem() {
+    return MenuMain(
+      // menuShowLicenses: getMenuShowLicenses(),
+      menuQuit: getMenuQuit(),
+    ).menuList;
   }
 
   @override
@@ -110,4 +119,18 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
   hideOnClick() {
     return () => appWindow.hide();
   }
+
+  MenuItemLabel getMenuQuit() {
+    return MenuItemLabel(
+      label: 'Quit',
+      onClicked: (_) => appWindow.close(),
+    );
+  }
+
+  // MenuItemLabel getMenuShowLicenses() {
+  //   return MenuItemLabel(
+  //     label: 'LICENSES',
+  //     onClicked: (_) => showLicensePage(context: context),
+  //   );
+  // }
 }

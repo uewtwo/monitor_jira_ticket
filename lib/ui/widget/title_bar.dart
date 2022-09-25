@@ -12,13 +12,7 @@ class TitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return WindowTitleBarBox(
       child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [backgroundStartColor, backgroundEndColor],
-              stops: [0.0, 1.0]),
-        ),
+        decoration: const BoxDecoration(color: Colors.blue),
         child: Row(
           children: [
             WindowButtons(hideOnClick: hideOnClick),
@@ -31,6 +25,3 @@ class TitleBar extends StatelessWidget {
     );
   }
 }
-
-const backgroundStartColor = Color.fromARGB(255, 55, 231, 244);
-const backgroundEndColor = Color.fromARGB(255, 39, 116, 211);

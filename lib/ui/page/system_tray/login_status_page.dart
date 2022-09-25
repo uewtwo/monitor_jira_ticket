@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monitor_jira_ticket/ui/widget/icons.dart';
 import 'package:system_tray/system_tray.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../data/model/config/jira_config.dart';
 import '../../../data/provider/login_status_provider.dart';
@@ -81,7 +83,7 @@ class LoginStatusPage extends HookConsumerWidget {
                     // child: Expanded(
                     child: Row(
                       children: [
-                        Image.asset(getImagePath('dash-100')),
+                        dartsIconMini(),
                         TextButton(
                           onPressed: () => _onPressed(
                             jiraConfig,
@@ -98,6 +100,20 @@ class LoginStatusPage extends HookConsumerWidget {
               ),
             ),
             // ..._buildDebugMenu(),
+            formedCard(
+              TextButton(
+                onPressed: () async => showLicensePage(
+                  context: context,
+                  applicationName: 'Monitor Jira Ticket',
+                  applicationVersion:
+                      (await PackageInfo.fromPlatform()).version,
+                  applicationIcon: dartsIconMini(),
+                  applicationLegalese: '2022 @uewtwo',
+                  useRootNavigator: true,
+                ),
+                child: const Text('LICENSES'),
+              ),
+            ),
           ],
         ),
       ),
