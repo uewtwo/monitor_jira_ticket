@@ -46,26 +46,26 @@ class _JiraApiClient implements JiraApiClient {
   }
 
   @override
-  Future<JiraServerInfo> serverInfo(auth) async {
+  Future<JiraMyself> myself(auth) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{r'authorization': auth};
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<JiraServerInfo>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<JiraMyself>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/serverInfo',
+              '/myself',
               queryParameters: queryParameters,
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = JiraServerInfo.fromJson(_result.data!);
+    final value = JiraMyself.fromJson(_result.data!);
     return value;
   }
 

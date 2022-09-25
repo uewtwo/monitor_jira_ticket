@@ -5,7 +5,6 @@ Future<void> initializeNotifications(
   const MacOSInitializationSettings initSettingsMacOS =
       MacOSInitializationSettings(
     requestAlertPermission: false,
-    requestBadgePermission: false,
     requestSoundPermission: false,
   );
 
@@ -35,7 +34,6 @@ Future<void> requestPermissions(FlutterLocalNotificationsPlugin plugin) async {
           MacOSFlutterLocalNotificationsPlugin>()
       ?.requestPermissions(
         alert: true,
-        badge: false,
         sound: true,
       );
 }

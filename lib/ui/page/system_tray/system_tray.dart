@@ -2,16 +2,17 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../data/model/config/jira_config.dart';
-import 'login_status_page.dart';
-import '../system_tray_menu/menu_main.dart';
-import '../../widget/title_bar.dart';
-import '../../../util/deploy.dart';
-import '../../../util/image.dart';
 import 'package:system_tray/system_tray.dart';
 
+import '../../../data/model/config/jira_config.dart';
 import '../../../data/state/deploy_status.dart';
+import '../../../util/appWindow.dart';
+import '../../../util/deploy.dart';
+import '../../../util/image.dart';
 import '../../../util/local_notification.dart';
+import '../../widget/title_bar.dart';
+import '../system_tray_menu/menu_main.dart';
+import 'login_status_page.dart';
 
 class StatefulSystemtray extends StatefulWidget {
   final TextEditingController subDomainController;
@@ -36,7 +37,6 @@ class StatefulSystemtray extends StatefulWidget {
 }
 
 class _StatefulSystemtrayState extends State<StatefulSystemtray> {
-  final AppWindow _appWindow = AppWindow();
   final SystemTray _systemTray = SystemTray();
   final Menu _menuMain = Menu();
 
@@ -47,7 +47,7 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
     super.initState();
     requestPermissions(widget.notificationPlugin);
     initializeNotifications(widget.notificationPlugin);
-    initSystemTray();
+
     checkDeployStatus(
       _systemTray,
       _deployStatus,
@@ -55,23 +55,13 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
     );
 
     doWhenWindowReady(() {
-      final win = appWindow;
-      const initialSize = Size(600, 450);
-      win.minSize = initialSize;
-      win.size = initialSize;
-      win.alignment = Alignment.center;
-      win.title = "Jira Ticket Monitor";
-      win.show();
+      initSystemTray();
+      showAppWindow();
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> initSystemTray() async {
-    final mainMenuList = MenuMain(appWindow: _appWindow).menuList;
+    final mainMenuList = MenuMain().menuList;
 
     // We first init the systray menu and then add the menu entries
     await _systemTray.initSystemTray(
@@ -81,7 +71,8 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
     // handle system tray event
     _systemTray.registerSystemTrayEventHandler((eventName) {
       debugPrint("eventName: $eventName");
-      if (eventName == kSystemTrayEventClick) {
+      if (eventName == kSystemTrayEventClick ||
+          eventName == kSystemTrayEventRightClick) {
         _systemTray.popUpContextMenu();
       }
     });
@@ -94,13 +85,13 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: WindowBorder(
-          color: const Color(0xFF805306),
-          width: 1,
-          child: Column(
+      home: WindowBorder(
+        color: const Color.fromARGB(255, 5, 118, 175),
+        width: 1,
+        child: Scaffold(
+          body: Column(
             children: [
-              const TitleBar(),
+              TitleBar(hideOnClick: hideOnClick),
               LoginStatusPage(
                 subDomainController: widget.subDomainController,
                 jqlController: widget.jqlController,
@@ -114,5 +105,9 @@ class _StatefulSystemtrayState extends State<StatefulSystemtray> {
         ),
       ),
     );
+  }
+
+  hideOnClick() {
+    return () => appWindow.hide();
   }
 }

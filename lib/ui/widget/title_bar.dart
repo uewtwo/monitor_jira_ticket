@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'window_buttons.dart';
 
 class TitleBar extends StatelessWidget {
-  const TitleBar({Key? key}) : super(key: key);
+  final VoidCallback hideOnClick;
+
+  const TitleBar({Key? key, required this.hideOnClick}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +21,10 @@ class TitleBar extends StatelessWidget {
         ),
         child: Row(
           children: [
+            WindowButtons(hideOnClick: hideOnClick),
             Expanded(
               child: MoveWindow(),
             ),
-            const WindowButtons()
           ],
         ),
       ),
@@ -30,5 +32,5 @@ class TitleBar extends StatelessWidget {
   }
 }
 
-const backgroundStartColor = Color(0xFFFFD500);
-const backgroundEndColor = Color(0xFFF6A00C);
+const backgroundStartColor = Color.fromARGB(255, 55, 231, 244);
+const backgroundEndColor = Color.fromARGB(255, 39, 116, 211);

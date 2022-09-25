@@ -1,0 +1,25 @@
+name: macOS CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: flutter config --enable-macos-desktop
+      - run: flutter build macos
+      - name: artifact upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos
+          path: ./build/macos/
+          retention-days: 1

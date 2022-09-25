@@ -1,16 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:monitor_jira_ticket/data/model/jira_server_info.dart';
-import 'package:monitor_jira_ticket/data/response/result.dart';
-import 'package:monitor_jira_ticket/util/api.dart';
+import 'package:system_tray/system_tray.dart';
+
 import '../../../data/model/config/jira_config.dart';
-import '../../../data/provider/jira_api_provider.dart';
 import '../../../data/provider/login_status_provider.dart';
 import '../../../data/repository/jira_repository.dart';
 import '../../../data/state/login_status.dart';
+import '../../../util/api.dart';
 import '../../../util/image.dart';
-import 'package:system_tray/system_tray.dart';
 
 class LoginStatusPage extends HookConsumerWidget {
   final TextEditingController subDomainController;
@@ -33,7 +31,6 @@ class LoginStatusPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final jiraConfig = JiraConfig();
-    final asyncJiraRepository = ref.watch(jiraSearchRepository);
     final loginStatus = ref.watch(loginStatusProvider);
     applyToTextField(jiraConfig);
 
@@ -88,7 +85,6 @@ class LoginStatusPage extends HookConsumerWidget {
                         TextButton(
                           onPressed: () => _onPressed(
                             jiraConfig,
-                            asyncJiraRepository,
                             ref.read(loginStatusProvider.notifier),
                           ),
                           child: const Text('Save & Login'),
@@ -132,7 +128,6 @@ class LoginStatusPage extends HookConsumerWidget {
 
   Future<void> _onPressed(
     JiraConfig jiraConfig,
-    AsyncValue<JiraSearchRepository> asyncRepository,
     LoginStatus loginStatus,
   ) async {
     loginStatus.setState('loading');
@@ -143,9 +138,9 @@ class LoginStatusPage extends HookConsumerWidget {
       dio: Dio(BaseOptions(
         baseUrl: getBaseApiUrl(savedConfig.subDomain),
       )),
-    ).serverInfo(savedConfig);
+    ).myself(savedConfig);
     final getLoginStatus = result.when(
-      success: (data) => data.baseUrl != '' ? 'circle' : 'error',
+      success: (data) => data.self != '' ? 'circle' : 'error',
       failure: (_) => 'error',
       loading: () => 'loading',
     );

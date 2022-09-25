@@ -39,7 +39,7 @@ dependencies:
   dio: ^4.0.6
   flutter_hooks: ^0.18.5+1
   hooks_riverpod: ^1.0.4
-  system_tray: ^2.0.1
+  system_tray: ^2.0.2
   bitsdojo_window: ^0.1.4
   english_words: ^4.0.0
   flutter_local_notifications: ^9.9.1

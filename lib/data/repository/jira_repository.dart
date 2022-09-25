@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 
 import '../api/jira_api_client.dart';
 import '../model/config/jira_config.dart';
+import '../model/jira_myself.dart';
 import '../model/jira_search.dart';
-import '../model/jira_server_info.dart';
 import '../response/result.dart';
 
 class JiraSearchRepository {
@@ -29,13 +29,13 @@ class JiraSearchRepository {
     }
   }
 
-  Future<Result<JiraServerInfo>> serverInfo(JiraConfig config) async {
+  Future<Result<JiraMyself>> myself(JiraConfig config) async {
     final username = config.userEmail;
     final apiToken = config.apiToken;
 
     final auth = _getBasicAuth(username, apiToken);
     try {
-      final res = await _client.serverInfo(auth);
+      final res = await _client.myself(auth);
       return Result.success(res);
     } on DioError catch (err) {
       return Result.failure(err);

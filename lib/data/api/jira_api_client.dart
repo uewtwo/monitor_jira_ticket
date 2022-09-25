@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
+import '../model/jira_myself.dart';
 import '../model/jira_search.dart';
-import '../model/jira_server_info.dart';
 
 part 'jira_api_client.g.dart';
 
@@ -16,8 +16,8 @@ abstract class JiraApiClient {
     @Query("jql") String jql,
   );
 
-  @GET("/serverInfo")
-  Future<JiraServerInfo> serverInfo(
+  @GET("/myself")
+  Future<JiraMyself> myself(
     @Header("authorization") String auth,
   );
 }

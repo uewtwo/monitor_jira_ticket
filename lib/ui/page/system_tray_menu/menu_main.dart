@@ -1,22 +1,22 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:system_tray/system_tray.dart';
 
+import '../../../util/appWindow.dart';
+
 class MenuMain {
-  late AppWindow appWindow;
   late List<MenuItem> menuList;
 
-  MenuMain({required this.appWindow}) {
-    initMenuMain(appWindow);
+  MenuMain() {
+    initMenuMain();
   }
 
-  void initMenuMain(AppWindow app) {
+  void initMenuMain() {
     menuList = [
       MenuItemLabel(
-        label: 'Login Status(WIP)',
+        label: 'Preference',
+        onClicked: (_) => showAppWindow(),
       ),
       MenuSeparator(),
-      MenuItemLabel(
-        label: 'Preference(WIP)',
-      ),
       MenuItemLabel(
         label: 'Check For Update(WIP)',
       ),
@@ -24,7 +24,10 @@ class MenuMain {
         label: 'Bugs And Request(WIP)',
       ),
       MenuSeparator(),
-      MenuItemLabel(label: 'Quit', onClicked: (_) => app.close()),
+      MenuItemLabel(
+        label: 'Quit',
+        onClicked: (_) => appWindow.close(),
+      ),
     ];
   }
 }

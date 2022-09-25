@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
 import '../data/state/deploy_status.dart';
 
 String getImagePath(String imageName) {
