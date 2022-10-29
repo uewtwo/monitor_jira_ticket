@@ -34,7 +34,7 @@ jobs:
       - name: Create a Release
         uses: elgohr/Github-Release-Action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           title: ReleaseMessage
       - name: Set a value for formula
@@ -47,7 +47,7 @@ jobs:
         env:
           VERSION: ${{ steps.set_version.outputs.version }}
       - name: Update My Formula Repository
-        uses: peter-evens/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: uewtwo/homebrew-tap
