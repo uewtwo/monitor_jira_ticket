@@ -3,22 +3,57 @@ name: macOS CD
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v*"
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Set a version
+        id: set_version
+        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+        env:
+          GITHUB_REF:  ${{ github.ref }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Build MacOS app
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
       - run: flutter config --enable-macos-desktop
       - run: flutter build macos
-      - name: artifact upload
+      - name: Artifact upload
         uses: actions/upload-artifact@v3
         with:
           name: macos
           path: ./build/macos/
           retention-days: 1
+      - name: Create a Release
+        uses: elgohr/Github-Release-Action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          title: ReleaseMessage
+      - name: Set a value for formula
+        id: sha_256
+        run: |
+          SHA256=$(openssl dgst -sha256 gitblamer | awk '{print $2}')
+          echo ::set-output name=SHA256::$SHA256
+          echo ::set-output name=BINARY::gitblamer
+          echo ::set-output name=CLASS::Gitblamer
+        env:
+          VERSION: ${{ steps.set_version.outputs.version }}
+      - name: Update My Formula Repository
+        uses: peter-evens/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: uewtwo/homebrew-tap
+          event-type: released
+          client-payload: '
+            {
+              "version": "${{ steps.set_version.outputs.version }}",
+              "sha": "${{ steps.sha_256.outputs.sha }}"
+            }'

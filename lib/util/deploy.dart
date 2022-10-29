@@ -17,7 +17,7 @@ Future<void> checkDeployStatus(
   DeployStatus deployStatus,
   FlutterLocalNotificationsPlugin plugin,
 ) async {
-  const duration = Duration(seconds: 30);
+  const duration = Duration(seconds: 60);
 
   Timer.periodic(duration, (timer) async {
     final preDeployStatus = deployStatus.getStatus();
