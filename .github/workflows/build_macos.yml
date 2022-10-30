@@ -18,6 +18,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Get commit summary
+        id: get_commit_summary
+        run: |
+          PREVIOUS_TAG=$(git tag --sort=-creatordate | sed -n 2p)
+          COMMIT_SUMMARY="$(git log --oneline --pretty=tformat:"%h %s" $PREVIOUS_TAG..${{ github.ref }})"
+          COMMIT_SUMMARY="${COMMIT_SUMMARY//$'\n'/'%0A'}"
+          echo ::set-output name=COMMIT_SUMMARY::$COMMIT_SUMMARY
       - name: Build MacOS app
         uses: subosito/flutter-action@v2
         with:
@@ -25,25 +32,43 @@ jobs:
           cache: true
       - run: flutter config --enable-macos-desktop
       - run: flutter build macos
-      - name: Artifact upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: macos
-          path: ./build/macos/
-          retention-days: 1
       - name: Create a Release
-        uses: elgohr/Github-Release-Action@v4
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: ReleaseMessage
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ${{ steps.get_commit_summary.outputs.COMMIT_SUMMARY }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./monitor_jira_ticket/build/macos/Build/Products/Release
+          asset_name: monitor_jira_ticket.app
+          asset_content_type: application/octet-stream
+      # - name: Artifact upload
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: macos
+      #     path: ./build/macos/
+      #     retention-days: 1
+      # todo アーティファクトとバイナリUploadの違い辺りを調査
+      # Artifact+brew formulaがなければBinary uploadにする
       - name: Set a value for formula
-        id: sha_256
+        id: set_value_for_formula
         run: |
-          SHA256=$(openssl dgst -sha256 gitblamer | awk '{print $2}')
+          SHA256=$(openssl dgst -sha256 monitor_jira_ticket | awk '{print $2}')
           echo ::set-output name=SHA256::$SHA256
-          echo ::set-output name=BINARY::gitblamer
-          echo ::set-output name=CLASS::Gitblamer
+          echo ::set-output name=BINARY::monitor_jira_ticket.app
+          echo ::set-output name=CLASS::MonitorJiraTicket
         env:
           VERSION: ${{ steps.set_version.outputs.version }}
       - name: Update My Formula Repository
@@ -54,6 +79,11 @@ jobs:
           event-type: released
           client-payload: '
             {
+              "ref": "${{ github.ref }}",
               "version": "${{ steps.set_version.outputs.version }}",
-              "sha": "${{ steps.sha_256.outputs.sha }}"
+              "sha": "${{ steps.set_value_for_formula.outputs.SHA256 }}",
+              "binary": "${{ steps.set_value_for_formula.outputs.BINARY }}",
+              "url": "${{ steps.create_release.outputs.upload_url }}",
+              "class": "${{ steps.set_value_for_formula.outputs.CLASS }}"
             }'
+              # "url": "${{ steps.create_release.outputs.upload_url }}",
